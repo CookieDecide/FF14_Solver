@@ -147,6 +147,33 @@ def get_neighbors(state):
     random.shuffle(neighbors)
     return neighbors
 
+def printMacro(macro):
+    ref = {actions.basic_synthesis: '/ac "Basic Synthesis" <wait.3>', 
+        actions.basic_touch: '/ac "Basic Touch" <wait.3>', 
+        actions.master_mend: '/ac "Master\'s Mend" <wait.3>', 
+        actions.waste_not: '/ac "Waste Not" <wait.3>', 
+        actions.veneration: '/ac "Veneration" <wait.3>', 
+        actions.standard_touch: '/ac "Standard Touch" <wait.3>', 
+        actions.great_strides: '/ac "Great Strides" <wait.3>', 
+        actions.innovation: '/ac "Innovation" <wait.3>', 
+        actions.waste_not2: '/ac "Waste Not II" <wait.3>', 
+        actions.Byregots_blessing: '/ac "Byregot\'s Blessing" <wait.3>', 
+        actions.careful_synthesis: '/ac "Careful Synthesis" <wait.3>', 
+        actions.manipulation: '/ac "Manipulation" <wait.3>', 
+        actions.preparatory_touch: '/ac "Preparatory Touch" <wait.3>', 
+        actions.groundwork: '/ac "Groundwork" <wait.3>', 
+        actions.delicate_synthesis: '/ac "Delicate Synthesis" <wait.3>', 
+        actions.reflect: '/ac "Reflect" <wait.3>', 
+        actions.muscle_memory: '/ac "Muscle Memory" <wait.3>'}
+
+    i = 1
+    for action in macro:
+        if(i%15==0):
+            print('/echo Macro #1 complete <se.1>')
+        print(ref[action])
+        i+=1
+    print('/echo Macro #' + str(int(i/15+1)) + ' complete <se.1>')
+
 def initial():
     job = input("Choose Job:(Alchemist(1),Goldsmith(2),Blacksmith(3),Armorer(4),Culinarian(5),Leatherworker(6),Weaver(7),Carpenter(8))")
     level = input("Choose Recipelevel:")
@@ -211,7 +238,7 @@ def main():
         #if((maximum[2] > maxprogress) and (maximum[3] > maxquality)):
         #    break
 
-    print(maximum)
+    printMacro(maximum[0])
 
     end = time.perf_counter()
     print(f'Finished in {round(end-start, 2)} second(s)') 
