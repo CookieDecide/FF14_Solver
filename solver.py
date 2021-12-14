@@ -1,7 +1,8 @@
 import actions
 import random
 import time
-import argparse
+import sqlite3
+import math
 
 glob_maxsteps = 0
 glob_maxprogress = 0
@@ -146,57 +147,42 @@ def get_neighbors(state):
     random.shuffle(neighbors)
     return neighbors
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "pprogress",
-        help="Progressincrement at 100%% efficiency",
-        type=int
-    )
-    parser.add_argument(
-        "pquality",
-        help="Qualityincrement at 100%% efficiency",
-        type=int
-    )
-    parser.add_argument(
-        "maxsteps",
-        help="Maximal Macro length",
-        type=int
-    )
-    parser.add_argument(
-        "maxprogress",
-        help="Neded Progress to finish",
-        type=int
-    )
-    parser.add_argument(
-        "maxquality",
-        help="Maximum attainable quality",
-        type=int
-    )
-    parser.add_argument(
-        "maxdurability",
-        help="Recipe durability",
-        type=int
-    )
-    parser.add_argument(
-        "cp",
-        help="Maximum available CP",
-        type=int
-    )
-    parser.add_argument(
-        "miniterations",
-        help="Minimum iterations",
-        type=int
-    )
-    return parser.parse_args()
+def initial():
+    job = input("Choose Job:(Alchemist(1),Goldsmith(2),Blacksmith(3),Armorer(4),Culinarian(5),Leatherworker(6),Weaver(7),Carpenter(8))")
+    level = input("Choose Recipelevel:")
+
+    con = sqlite3.connect('./DB/recipe.db') 
+    cur = con.cursor()
+    cur.execute('SELECT * FROM recipe WHERE job = ? AND baseLevel = ?;',(job,level,))
+    rows = cur.fetchall()
+
+    index = 0
+    for row in rows:
+        print([index, row])
+        index += 1
+
+    recipeindex = int(input("Choose recipe by index:"))
+    recipe = rows[recipeindex]
+
+    print(recipe)
+
+    craftsmanship = int(input("Craftsmanship: "))
+    control = int(input("Control: "))
+
+    pprogress = (craftsmanship * 10) / recipe[10] + 2
+    pquality = (control * 10) / recipe[12] + 35
+
+    cp = int(input("Maximum CP: "))
+
+    actions.set100(pprogress, pquality)
+
+    return recipe, cp
 
 def main():
+    recipe, cp = initial()
     start = time.perf_counter()
 
-    args = parse_args()
-
-    setGlob(args.maxsteps, args.maxprogress, args.maxquality, args.maxdurability, args.cp, args.miniterations)
-    actions.set100(args.pprogress, args.pquality)
+    setGlob(100, recipe[1], recipe[4], recipe[2], cp, 100)#maxsteps, maxprogress, maxquality, maxdurability, cp, miniterations
 
     maximum = [[], 0, 0, 0]
     t=1
@@ -219,7 +205,7 @@ def main():
         #print(quality)
         #print(steps)
         print(t)
-        if(t%100==0):
+        if(t%10==0):
             print(maximum)
         t+=1
         #if((maximum[2] > maxprogress) and (maximum[3] > maxquality)):
